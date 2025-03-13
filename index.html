@@ -1,107 +1,5 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo da Velha</title>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            margin: 0;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 10px;
-            margin: 20px 0;
-            background-color: #343a40;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .cell {
-            width: 100px;
-            height: 100px;
-            background-color: #ffffff;
-            border: 2px solid #dee2e6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.5em; /* Aumentar o tamanho das letras */
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .cell:hover {
-            background-color: #f8f9fa;
-        }
-        .btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 10px 5px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            transition: background-color 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .btn-restart {
-            background-color: #28a745;
-        }
-        .btn-restart:hover {
-            background-color: #218838;
-        }
-        .btn-ai {
-            background-color: #ffc107;
-        }
-        .btn-ai:hover {
-            background-color: #e0a800;
-        }
-        .button-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-        }
-        .timer {
-            font-size: 1.2em;
-            margin: 10px;
-            padding: 10px 20px;
-            background-color: #343a40;
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .timer span {
-            font-weight: bold;
-            color: #ffc107;
-        }
-        .cell .X {
-            color: blue;
-            font-weight: bold;
-            text-shadow: 2px 2px 5px rgba(0, 0, 255, 0.5); /* Adicionar sombra ao texto */
-        }
-        .cell .O {
-            color: red;
-            font-weight: bold;
-            text-shadow: 2px 2px 5px rgba(255, 0, 0, 0.5); /* Adicionar sombra ao texto */
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-</head>
 <body>
+    <div class="message-bar" id="messageBar"></div>
     <div class="container">
         <div class="cell" data-cell></div>
         <div class="cell" data-cell></div>
@@ -119,119 +17,55 @@
         <button class="btn btn-ai" id="toggleAI">Máquina como Jogador Nº2: Desligado</button>
         <button class="btn btn-restart" id="restartGame">Recomeçar Jogo</button>
     </div>
+    <style>
+        .message-bar {
+            width: 100%;
+            padding: 10px;
+            background-color: black;
+            color: white;
+            text-align: center;
+            font-size: 1.2em;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+    </style>
     <script>
-        const cellElements = document.querySelectorAll('[data-cell]');
-        let currentPlayer = 'X';
-        let aiEnabled = false;
-        const toggleAIButton = document.getElementById('toggleAI');
-        const restartGameButton = document.getElementById('restartGame');
-        const timerX = document.getElementById('timerX');
-        const timerO = document.getElementById('timerO');
-        let timerInterval;
-        const winningCombinations = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ];
+        const messageBar = document.getElementById('messageBar');
 
-        toggleAIButton.addEventListener('click', () => {
-            aiEnabled = !aiEnabled;
-            toggleAIButton.textContent = aiEnabled ? 'Máquina como Jogador Nº2: Ligado' : 'Máquina como Jogador Nº2: Desligado';
-        });
-
-        restartGameButton.addEventListener('click', resetGame);
-
-        cellElements.forEach(cell => {
-            cell.addEventListener('click', handleClick, { once: true });
-        });
-
-        startTimer();
+        function showMessage(message) {
+            messageBar.textContent = message;
+            messageBar.style.display = 'block';
+            setTimeout(() => {
+                messageBar.style.display = 'none';
+            }, 3000); // Mensagem desaparecerá após 3 segundos
+        }
 
         function handleClick(e) {
             const cell = e.target;
             cell.innerHTML = `<span class="${currentPlayer}">${currentPlayer}</span>`;
             if (checkWin(currentPlayer)) {
-                setTimeout(() => {
-                    alert(currentPlayer + ' ganhou!');
-                    resetGame();
-                }, 10);
+                showMessage(currentPlayer + ' ganhou!');
+                resetGame();
             } else if (isDraw()) {
-                setTimeout(() => {
-                    alert('Empate!');
-                    resetGame();
-                }, 10);
+                const playerXTime = parseInt(timerX.textContent);
+                const playerOTime = parseInt(timerO.textContent);
+                if (playerXTime < playerOTime) {
+                    showMessage('Empate! Jogador X venceu pelo menor tempo!');
+                } else if (playerOTime < playerXTime) {
+                    showMessage('Empate! Jogador O venceu pelo menor tempo!');
+                } else {
+                    showMessage('Empate absoluto! Ninguém venceu.');
+                }
+                resetGame();
             } else {
                 currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
                 startTimer();
                 if (aiEnabled && currentPlayer === 'O') {
-                    setTimeout(makeAIMove, 500); // Pequeno atraso para a jogada da IA
+                    setTimeout(makeAIMove, 500);
                 }
-            }
-        }
-
-        function checkWin(player) {
-            return winningCombinations.some(combination => {
-                return combination.every(index => {
-                    return cellElements[index].textContent === player;
-                });
-            });
-        }
-
-        function isDraw() {
-            return [...cellElements].every(cell => {
-                return cell.textContent === 'X' || cell.textContent === 'O';
-            });
-        }
-
-        function resetGame() {
-            setTimeout(() => {
-                cellElements.forEach(cell => {
-                    cell.textContent = '';
-                    cell.addEventListener('click', handleClick, { once: true });
-                });
-                currentPlayer = 'X';
-                clearInterval(timerInterval);
-                timerX.textContent = '0';
-                timerO.textContent = '0';
-                startTimer();
-            }, 50); // Pequeno atraso para garantir que o popup foi fechado
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if (currentPlayer === 'X') {
-                    timerX.textContent = parseInt(timerX.textContent) + 1;
-                } else {
-                    timerO.textContent = parseInt(timerO.textContent) + 1;
-                }
-            }, 1000);
-        }
-
-        function makeAIMove() {
-            const emptyCells = [...cellElements].filter(cell => !cell.textContent);
-            const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            randomCell.innerHTML = '<span class="O">O</span>';
-            if (checkWin('O')) {
-                setTimeout(() => {
-                    alert('O ganhou!');
-                    resetGame();
-                }, 10);
-            } else if (isDraw()) {
-                setTimeout(() => {
-                    alert('Empate!');
-                    resetGame();
-                }, 10);
-            } else {
-                currentPlayer = 'X';
-                startTimer();
             }
         }
     </script>
 </body>
-</html>
