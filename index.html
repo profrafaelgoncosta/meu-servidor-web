@@ -34,7 +34,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2.5em; /* Aumentar o tamanho das letras */
+            font-size: 2.5em;
             cursor: pointer;
             transition: background-color 0.3s;
         }
@@ -91,12 +91,12 @@
         .cell .X {
             color: blue;
             font-weight: bold;
-            text-shadow: 2px 2px 5px rgba(0, 0, 255, 0.5); /* Adicionar sombra ao texto */
+            text-shadow: 2px 2px 5px rgba(0, 0, 255, 0.5);
         }
         .cell .O {
             color: red;
             font-weight: bold;
-            text-shadow: 2px 2px 5px rgba(255, 0, 0, 0.5); /* Adicionar sombra ao texto */
+            text-shadow: 2px 2px 5px rgba(255, 0, 0, 0.5);
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -162,14 +162,14 @@
                 }, 10);
             } else if (isDraw()) {
                 setTimeout(() => {
-                    alert('Empate!');
+                    checkTieBreaker();
                     resetGame();
                 }, 10);
             } else {
                 currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
                 startTimer();
                 if (aiEnabled && currentPlayer === 'O') {
-                    setTimeout(makeAIMove, 500); // Pequeno atraso para a jogada da IA
+                    setTimeout(makeAIMove, 500);
                 }
             }
         }
@@ -199,7 +199,7 @@
                 timerX.textContent = '0';
                 timerO.textContent = '0';
                 startTimer();
-            }, 50); // Pequeno atraso para garantir que o popup foi fechado
+            }, 50);
         }
 
         function startTimer() {
@@ -224,12 +224,25 @@
                 }, 10);
             } else if (isDraw()) {
                 setTimeout(() => {
-                    alert('Empate!');
+                    checkTieBreaker();
                     resetGame();
                 }, 10);
             } else {
                 currentPlayer = 'X';
                 startTimer();
+            }
+        }
+
+        function checkTieBreaker() {
+            const timeX = parseInt(timerX.textContent);
+            const timeO = parseInt(timerO.textContent);
+
+            if (timeX < timeO) {
+                alert('Empate! O jogador X venceu no critério de desempate pelo menor tempo total de jogada!');
+            } else if (timeO < timeX) {
+                alert('Empate! O jogador O venceu no critério de desempate pelo menor tempo total de jogada!');
+            } else {
+                alert('Empate! Ambos jogadores tiveram o mesmo tempo total.');
             }
         }
     </script>
